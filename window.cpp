@@ -40,11 +40,13 @@ void Window::onInit()
     if (!program_->link()) {
         qDebug() << "Ошибка линковки:" << program_->log();
     }
+    program_->bind();
 
     // Configure textures
     texture_ = std::make_unique<QOpenGLTexture>(QImage(":/textures/cat.jpg"));
     texture_->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
     texture_->setWrapMode(QOpenGLTexture::WrapMode::Repeat);
+    program_->setUniformValue("tex_2d", 0);
 
     // Configure uniforms
     mvpUniform_ = program_->uniformLocation("mvp");
@@ -68,8 +70,6 @@ void Window::onInit()
     ibo_.allocate(indices.data(), static_cast<int>(indices.size() * sizeof(GLuint)));
 
     // Bind attributes
-    program_->bind();
-
     program_->enableAttributeArray(0);
     program_->setAttributeBuffer(0, GL_FLOAT, 0, 2, static_cast<int>(7 * sizeof(GLfloat)));
 
