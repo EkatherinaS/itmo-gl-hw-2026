@@ -22,11 +22,15 @@ public:
     void onResize(size_t width, size_t height) override;
 
 private:
-    QElapsedTimer timer_;
-    GLint colorUniform_ = -1;
-    float hue_ = 0;
+    GLint viewPosUniform_ = -1;
+    GLint lightPosUniform_ = -1;
+    GLint lightColorUniform_ = -1;
 
-    GLint mvpUniform_ = -1;
+    GLint modelUniform_ = -1;
+    GLint viewUniform_ = -1;
+    GLint projectionUniform_ = -1;
+
+    QElapsedTimer timer_;
 
     QMatrix4x4 model_;
     QMatrix4x4 view_;
@@ -36,9 +40,7 @@ private:
     QOpenGLBuffer ibo_{QOpenGLBuffer::Type::IndexBuffer};
     QOpenGLVertexArrayObject vao_;
 
-    std::unique_ptr<QOpenGLTexture> texture_;
     std::unique_ptr<QOpenGLShaderProgram> program_;
 
     bool animated_ = true;
-    bool сolorAnimated_ = animated_;
 };

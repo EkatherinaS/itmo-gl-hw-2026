@@ -1,23 +1,35 @@
 #version 330 core
 
-uniform sampler2D tex_2d;
-uniform vec4 color;
+uniform vec3 light_pos;
+uniform vec3 light_color;
+uniform vec3 view_pos;
 
-in vec3 vert_col;
-in vec2 vert_tex;
+in vec3 frag_col;
+in vec3 frag_norm;
+in vec3 frag_pos;
 
 out vec4 out_col;
 
 void main() {
-        // Y-координата у формата jpg перевернута относительно OpenGL
-        vec4 texel = texture(tex_2d, vec2(vert_tex.x, 1.0 - vert_tex.y));
+        float ambient_strength = 0.2f;
+        float diffuse_strength = 0.3f;
+        float specular_strength = 0.5f;
 
-        // https://ru.wikipedia.org/wiki/Оттенки_серого
-        float greyscale_factor = dot(texel.rgb, vec3(0.21, 0.71, 0.07));
-        vec3 semi_greyscale = mix(vec3(greyscale_factor), vert_col.rgb, 0.7f);
+        vec3 normal = normalize(frag_norm);
+        vec3 light_dir = normalize(light_pos - frag_pos);
+        vec3 view_dir = normalize(view_pos - frag_pos);
 
-        // Анимированный цвет из uniform
-        vec3 animated_color = mix(color.rgb, semi_greyscale, 0.7f);
+        vec3 ambient = ambient_strength * frag_col.rgb;
 
-        out_col = vec4(animated_color, 1.0);
+        float diffuse_cosine = max(dot(normal, light_dir), 0.0);
+        vec3 diffuse = diffuse_strength * diffuse_cosine * mix(frag_col.rgb, light_color.rgb, 0.5);
+
+        float specular_power = 32;
+        vec3 reflect_dir = reflect(-light_dir, normal);
+        float reflection_cosine = max(dot(view_dir, reflect_dir), 0.0);
+        float specular_factor = pow(reflection_cosine, specular_power);
+        vec3 specular = specular_strength * specular_factor * light_color.rgb;
+
+        vec3 result = ambient + diffuse + specular;
+        out_col = vec4(result, 1.0f);
 }

@@ -1,13 +1,45 @@
 #include "window.h"
 
 #include <QLabel>
+#include <iostream>
 
-constexpr std::array<GLfloat, 21u> vertices = {
-    0.0f, 0.5f, 1.f,  0.f,  0.f,   0.5f, 1.0f, -0.5f, -0.5f, 0.f,  1.f,
-    0.f,  0.0f, 0.0f, 0.5f, -0.5f, 0.f,  0.f,  1.f,   1.0f,  0.0f,
+// PURPLE CUBE ✩₊˚.⋆☾⋆⁺₊✧
+
+constexpr std::array<GLfloat, 216u> vertices = {
+    -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.965f, 0.820f, 0.984f, // 1
+    0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.965f, 0.820f, 0.984f, // 2
+    0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.965f, 0.820f, 0.984f, // 3
+    -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.965f, 0.820f, 0.984f, // 4
+
+    -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.376f, 0.106f, 0.624f, // 5
+    0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.376f, 0.106f, 0.624f, // 6
+    0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.376f, 0.106f, 0.624f, // 7
+    -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.376f, 0.106f, 0.624f, // 8
+
+    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  0.231f, 0.035f, 0.329f, // 9
+    -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  0.231f, 0.035f, 0.329f, // 10
+    -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.231f, 0.035f, 0.329f, // 11
+    -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,  0.231f, 0.035f, 0.329f, // 12
+
+    0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.235f, 0.290f, 0.580f, // 13
+    0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.235f, 0.290f, 0.580f, // 14
+    0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,  0.235f, 0.290f, 0.580f, // 15
+    0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.235f, 0.290f, 0.580f, // 16
+
+    -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.510f, 0.290f, 0.596f, // 17
+    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.510f, 0.290f, 0.596f, // 18
+    0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.510f, 0.290f, 0.596f, // 19
+    -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.510f, 0.290f, 0.596f, // 20
+
+    -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.965f, 0.820f, 0.984f, // 21
+    0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.965f, 0.820f, 0.984f, // 22
+    0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.965f, 0.820f, 0.984f, // 23
+    -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.965f, 0.820f, 0.984f, // 24
 };
 
-constexpr std::array<GLuint, 3u> indices = {0, 1, 2};
+constexpr std::array<GLuint, 36u> indices = {0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,
+                                             8,  9,  10, 8,  10, 11, 12, 13, 14, 12, 14, 15,
+                                             16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
 
 Window::Window()
 {
@@ -27,7 +59,6 @@ Window::Window()
 
 Window::~Window()
 {
-    texture_.reset();
     program_.reset();
 }
 
@@ -42,16 +73,16 @@ void Window::onInit()
     }
     program_->bind();
 
-    // Configure textures
-    texture_ = std::make_unique<QOpenGLTexture>(QImage(":/textures/cat.jpg"));
-    texture_->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-    texture_->setWrapMode(QOpenGLTexture::WrapMode::Repeat);
-    program_->setUniformValue("tex_2d", 0);
-
     // Configure uniforms
-    mvpUniform_ = program_->uniformLocation("mvp");
-    colorUniform_ = program_->uniformLocation("color");
-    program_->setUniformValue(colorUniform_, QColor::fromHsv(0, 0, 255));
+    modelUniform_ = program_->uniformLocation("model");
+    viewUniform_ = program_->uniformLocation("view");
+    projectionUniform_ = program_->uniformLocation("projection");
+
+    viewPosUniform_ = program_->uniformLocation("view_pos");
+    lightPosUniform_ = program_->uniformLocation("light_pos");
+    lightColorUniform_ = program_->uniformLocation("light_color");
+
+    program_->setUniformValue(lightColorUniform_, QVector3D(1.0f, 1.0f, 0.8f));
 
     // Create VAO object
     vao_.create();
@@ -71,21 +102,21 @@ void Window::onInit()
 
     // Bind attributes
     program_->enableAttributeArray(0);
-    program_->setAttributeBuffer(0, GL_FLOAT, 0, 2, static_cast<int>(7 * sizeof(GLfloat)));
+    program_->setAttributeBuffer(0, GL_FLOAT, 0, 3, static_cast<int>(9 * sizeof(GLfloat)));
 
     program_->enableAttributeArray(1);
     program_->setAttributeBuffer(1,
                                  GL_FLOAT,
-                                 static_cast<int>(2 * sizeof(GLfloat)),
+                                 static_cast<int>(3 * sizeof(GLfloat)),
                                  3,
-                                 static_cast<int>(7 * sizeof(GLfloat)));
+                                 static_cast<int>(9 * sizeof(GLfloat)));
 
     program_->enableAttributeArray(2);
     program_->setAttributeBuffer(2,
                                  GL_FLOAT,
-                                 static_cast<int>(5 * sizeof(GLfloat)),
-                                 2,
-                                 static_cast<int>(7 * sizeof(GLfloat)));
+                                 static_cast<int>(6 * sizeof(GLfloat)),
+                                 3,
+                                 static_cast<int>(9 * sizeof(GLfloat)));
 
     // Release all
     program_->release();
@@ -111,36 +142,37 @@ void Window::onRender()
 
     // Calculate MVP matrix
     model_.setToIdentity();
-    model_.translate(0, 0, -1.5);
+    model_.translate(0.0, 0.0, -3.0);
+
     view_.setToIdentity();
-    const auto mvp = projection_ * view_ * model_;
+    view_.translate(-1.0, -1.0, 0.0);
+    view_.rotate(25.0, 1.0, -1.0, 0.0);
 
     // Bind shader program
     program_->bind();
 
     // Update uniform values
-    program_->setUniformValue(mvpUniform_, mvp);
+    program_->setUniformValue(modelUniform_, model_);
+    program_->setUniformValue(viewUniform_, view_);
+    program_->setUniformValue(projectionUniform_, projection_);
 
-    if (animated_ && сolorAnimated_) {
-        const float dt = timer_.restart() / 1000.0f;
-        hue_ = std::fmod(hue_ + dt * (60.0f / 360.0f), 1.0f);
-        program_->setUniformValue(colorUniform_, QColor::fromHsvF(hue_, 1.0, 1.0));
+    program_->setUniformValue(viewPosUniform_, view_.inverted().column(3).toVector3D());
+
+    if (animated_) {
+        const float absoluteTime = timer_.elapsed() / 1000.0f;
+        float lightXPos_ = std::sin(absoluteTime * 2.0f);
+        program_->setUniformValue(lightPosUniform_, QVector3D(lightXPos_, -0.5f, 0.0f));
     }
-
-    // Add textures
-    glActiveTexture(GL_TEXTURE0);
-    texture_->bind();
 
     // Bind VAO
     vao_.bind();
 
     // Draw
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
     // Release all
     vao_.release();
     program_->release();
-    texture_->release();
 
     if (animated_)
         update();
