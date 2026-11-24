@@ -20,10 +20,17 @@ set(PROJECT_SOURCES
 
 add_executable(itmo-gl-hw-2026
     ${PROJECT_SOURCES}
-    resources.qrc
+
+    models/christmas_village.glb
+    models/coliseum.glb
+    models/portal_gun.glb
+
     shaders/template.fs
     shaders/template.vs
+
+    resources.qrc
     openglwidget.h openglwidget.cpp
 )
 
-target_link_libraries(itmo-gl-hw-2026 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+add_subdirectory(gltfloader)
+target_link_libraries(itmo-gl-hw-2026 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets gltfloader)

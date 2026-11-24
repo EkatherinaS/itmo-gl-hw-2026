@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gltfloader/gltfloader.h"
 #include "openglwidget.h"
 
 #include <QElapsedTimer>
@@ -35,6 +36,8 @@ private:
     QMatrix4x4 model_;
     QMatrix4x4 view_;
     QMatrix4x4 projection_;
+
+    std::unique_ptr<GltfModel> gltfmodel_;
 
     QOpenGLBuffer vbo_{QOpenGLBuffer::Type::VertexBuffer};
     QOpenGLBuffer ibo_{QOpenGLBuffer::Type::IndexBuffer};
